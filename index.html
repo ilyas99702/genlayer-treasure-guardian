@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Treasure Guardian — GenLayer</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>" />
+  <meta name="description" content="An Intelligent Contract on GenLayer where an AI judges your words. Can you convince the Guardian?" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Particles Background -->
+  <div id="particles" aria-hidden="true"></div>
+
+  <!-- Ambient Light Orbs -->
+  <div class="orb orb-1" aria-hidden="true"></div>
+  <div class="orb orb-2" aria-hidden="true"></div>
+  <div class="orb orb-3" aria-hidden="true"></div>
+
+  <main class="app">
+
+    <!-- Header -->
+    <header class="header">
+      <!-- Wallet Bar -->
+      <div class="wallet-bar">
+        <div class="badge">
+          <span class="badge-dot"></span>
+          GenLayer Studionet
+        </div>
+        <!-- Disconnected state -->
+        <button class="btn-wallet" id="btn-connect" onclick="connectWallet()">
+          <span class="wallet-icon">🦊</span>
+          Connect MetaMask
+        </button>
+        <!-- Connected state (hidden by default) -->
+        <div class="wallet-connected" id="wallet-connected" style="display:none">
+          <div class="wallet-avatar" id="wallet-avatar">🦊</div>
+          <div class="wallet-info">
+            <span class="wallet-label">Connected</span>
+            <span class="wallet-address" id="wallet-address">0x0000...0000</span>
+          </div>
+          <button class="btn-disconnect" id="btn-disconnect" onclick="disconnectWallet()" title="Disconnect">
+            ✕
+          </button>
+        </div>
+      </div>
+
+      <h1 class="title">The Treasure Guardian</h1>
+      <p class="subtitle">A decentralized AI judges your words.<br/>Can you convince it?</p>
+    </header>
+
+    <!-- Status Card -->
+    <section class="status-card" id="status-section" aria-label="Treasure status">
+      <div class="status-icon" id="status-icon">⚡</div>
+      <p class="status-label">Treasure Status</p>
+      <div class="status-value" id="status-value">Loading...</div>
+      <button class="btn-secondary" id="btn-refresh" onclick="checkTreasure()">
+        <span>↻</span> Refresh
+      </button>
+    </section>
+
+    <!-- Game Card -->
+    <section class="game-card" aria-label="Challenge the Guardian">
+      <div class="guardian-avatar" id="guardian-avatar" aria-hidden="true">
+        <div class="avatar-ring"></div>
+        <div class="avatar-core">🛡️</div>
+        <div class="avatar-particles" id="avatar-particles"></div>
+      </div>
+
+      <h2 class="game-title">Challenge the Guardian</h2>
+      <p class="game-description">
+        Write a phrase that convinces it. The AI will read your words
+        and judge whether you are worthy of receiving the Treasure.
+      </p>
+
+      <div class="input-group">
+        <label for="user-phrase" class="input-label">Your convincing phrase</label>
+        <textarea
+          id="user-phrase"
+          class="phrase-input"
+          placeholder='e.g. "O great Guardian, with a heart full of humility..."'
+          maxlength="500"
+          rows="3"
+        ></textarea>
+        <div class="char-counter"><span id="char-count">0</span>/500</div>
+      </div>
+
+      <!-- Wallet gate: shows when not connected -->
+      <button class="btn-primary btn-wallet-gate" id="btn-wallet-gate" onclick="connectWallet()" style="display:none">
+        <span class="btn-icon">🦊</span>
+        <span class="btn-text">Connect MetaMask to Play</span>
+        <span class="btn-shimmer"></span>
+      </button>
+      <!-- Challenge button: shows when connected -->
+      <button class="btn-primary" id="btn-challenge" onclick="challengeGuardian()">
+        <span class="btn-icon">⚔️</span>
+        <span class="btn-text">Challenge the Guardian</span>
+        <span class="btn-shimmer"></span>
+      </button>
+    </section>
+
+    <!-- Result Modal -->
+    <div class="result-overlay" id="result-overlay" role="dialog" aria-modal="true" aria-labelledby="result-title" aria-hidden="true">
+      <div class="result-card" id="result-card">
+        <div class="result-icon" id="result-icon">🏆</div>
+        <h3 class="result-title" id="result-title">Guardian's Verdict</h3>
+        <p class="result-message" id="result-message"></p>
+        <div class="result-tx" id="result-tx"></div>
+        <button class="btn-secondary" onclick="closeResult()">Close</button>
+      </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loading-overlay" aria-hidden="true">
+      <div class="loading-content">
+        <div class="loading-orb">
+          <div class="loading-ring loading-ring-1"></div>
+          <div class="loading-ring loading-ring-2"></div>
+          <div class="loading-ring loading-ring-3"></div>
+          <div class="loading-core">🤖</div>
+        </div>
+        <p class="loading-title">The AI is deliberating...</p>
+        <p class="loading-subtitle" id="loading-step">Sending transaction to the GenLayer blockchain</p>
+      </div>
+    </div>
+
+    <!-- History -->
+    <section class="history-section" aria-label="Attempt history">
+      <h3 class="history-title">Attempt History</h3>
+      <div class="history-list" id="history-list">
+        <p class="history-empty">No attempts yet. Be the first to challenge the Guardian!</p>
+      </div>
+    </section>
+
+    <!-- Contract Info Footer -->
+    <footer class="contract-info">
+      <div class="info-row">
+        <span class="info-label">Contract</span>
+        <a class="info-value contract-address" id="contract-link" href="#" target="_blank" rel="noopener">
+          0xEc67e7aD33A88285e582404123EC8d43553ACa82
+        </a>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Network</span>
+        <span class="info-value">GenLayer Studionet</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Built with</span>
+        <span class="info-value">genlayer-js · GenLayer Intelligent Contracts</span>
+      </div>
+    </footer>
+
+  </main>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
