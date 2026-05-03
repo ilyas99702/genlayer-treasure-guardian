@@ -50,6 +50,9 @@ async function initClient(signerAddress) {
 
     const { createClient, createAccount } = sdk;
 
+    // Import viem to inject MetaMask
+    const { custom } = await import('https://esm.sh/viem@2');
+
     // Define Studionet explicitly to avoid local fallback
     const chain = {
       id: 61999,
@@ -60,11 +63,20 @@ async function initClient(signerAddress) {
       },
     };
 
-    // Always use an ephemeral account — Studio auto-funds new accounts
-    const account = createAccount();
-
-    glClient = createClient({ chain, account });
-    console.log('[GenLayer] Client ready on localnet (Studio). Signer:', account.address);
+    if (signerAddress && window.ethereum) {
+      // Connect GenLayer SDK natively to MetaMask Wallet
+      glClient = createClient({
+        chain,
+        transport: custom(window.ethereum),
+        account: signerAddress,
+      });
+      console.log('[GenLayer] Client connected using MetaMask Injected Wallet');
+    } else {
+      // Fallback
+      const account = createAccount();
+      glClient = createClient({ chain, account });
+      console.log('[GenLayer] Client connected using Ephemeral Account');
+    }
     return true;
   } catch (err) {
     console.error('[GenLayer] SDK load failed:', err);
