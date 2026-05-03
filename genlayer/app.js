@@ -346,7 +346,7 @@ async function challengeGuardian() {
 
       // If treasure is now gone and was there before → we won
       success = hasTreasureNow === false;
-
+    } // <-- Added missing closing bracket here
 
     hideLoading();
 
