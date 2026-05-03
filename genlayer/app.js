@@ -1,21 +1,21 @@
 /**
  * The Treasure Guardian — GenLayer dApp
  * genlayer-js v1.1.7 + MetaMask wallet adapter
- *
- * Contract:  0xEc67e7aD33A88285e582404123EC8d43553ACa82
+ * Contract:  0xaDcaA295C956B1098d6A49e83d3816133ed2902D
  * Network:   GenLayer Studionet — Chain ID 61999
+ * RPC:       https://studio.genlayer.com/api
  * RPC:       https://studio.genlayer.com/api
  */
 
 // ─────────────────────────────────────────────────────────
 // CONFIG
 // ─────────────────────────────────────────────────────────
-const CONTRACT_ADDRESS = '0xEc67e7aD33A88285e582404123EC8d43553ACa82';
+const CONTRACT_ADDRESS = '0xaDcaA295C956B1098d6A49e83d3816133ed2902D';
 
 // GenLayer Studio runs locally — transactions go to localhost:4000
 // The contract was deployed on Studio local, not on a public chain.
-const STUDIO_LOCAL_RPC  = 'http://127.0.0.1:4000/api';
-const STUDIO_LOCAL_UI   = 'http://localhost:8080';   // Studio web UI to check TXs
+const STUDIO_LOCAL_RPC  = 'https://studio.genlayer.com/api';
+const STUDIO_LOCAL_UI   = 'https://explorer-studio.genlayer.com';   // Studio web UI to check TXs
 
 const STUDIONET_METAMASK = {
   chainIdHex:       '0xF22F',   // 61999 decimal
@@ -52,7 +52,7 @@ async function initClient(signerAddress) {
 
     // localnet = GenLayer Studio local node at http://127.0.0.1:4000/api
     // This is where the contract was deployed.
-    const chain = chains.localnet;
+    const chain = chains.studionet || chains.localnet;
 
     // Always use an ephemeral account — Studio auto-funds new accounts
     const account = createAccount();
@@ -451,7 +451,7 @@ document.getElementById('contract-link').href = STUDIO_LOCAL_UI;
     if (!probe.ok) throw new Error('Studio not responding');
     console.log('[Studio] GenLayer Studio is running at', STUDIO_LOCAL_RPC);
   } catch (_) {
-    showToast('⚠️ GenLayer Studio not detected at localhost:4000 — start it first!');
+    showToast('⚠️ GenLayer Studio not detected at studio.genlayer.com — wait a moment!');
   }
 
   // Boot: init anonymous client for reads
