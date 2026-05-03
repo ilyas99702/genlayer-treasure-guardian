@@ -50,25 +50,18 @@ async function initClient(signerAddress) {
 
     const { createClient, createAccount } = sdk;
 
-    // Import viem to inject MetaMask
-    const { custom } = await import('https://esm.sh/viem@2');
-
-    // Define Studionet explicitly to avoid local fallback
-    const chain = {
-      id: 61999,
-      name: 'GenLayer Studionet',
-      nativeCurrency: { name: 'GEN', symbol: 'GEN', decimals: 18 },
-      rpcUrls: {
-        default: { http: [STUDIO_LOCAL_RPC] },
-      },
-    };
+    // We MUST use the official chain config from the SDK so that 'consensusMainContract' is defined!
+    const chain = chains.studionet || chains.localnet;
+    chain.id = 61999;
+    chain.name = 'GenLayer Studionet';
+    chain.rpcUrls.default.http = [STUDIO_LOCAL_RPC];
 
     if (signerAddress && window.ethereum) {
-      // Connect GenLayer SDK natively to MetaMask Wallet
+      // Connect GenLayer SDK natively to MetaMask Wallet by passing an address string
       glClient = createClient({
         chain,
-        transport: custom(window.ethereum),
         account: signerAddress,
+        provider: window.ethereum, // This overrides default fetch and sends through Metamask!
       });
       console.log('[GenLayer] Client connected using MetaMask Injected Wallet');
     } else {
