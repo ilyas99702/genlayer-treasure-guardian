@@ -50,9 +50,15 @@ async function initClient(signerAddress) {
 
     const { createClient, createAccount } = sdk;
 
-    // localnet = GenLayer Studio local node at http://127.0.0.1:4000/api
-    // This is where the contract was deployed.
-    const chain = chains.studionet || chains.localnet;
+    // Define Studionet explicitly to avoid local fallback
+    const chain = {
+      id: 61999,
+      name: 'GenLayer Studionet',
+      nativeCurrency: { name: 'GEN', symbol: 'GEN', decimals: 18 },
+      rpcUrls: {
+        default: { http: [STUDIO_LOCAL_RPC] },
+      },
+    };
 
     // Always use an ephemeral account — Studio auto-funds new accounts
     const account = createAccount();
@@ -341,14 +347,6 @@ async function challengeGuardian() {
       // If treasure is now gone and was there before → we won
       success = hasTreasureNow === false;
 
-    } else {
-      // Mock mode
-      updateLoadingStep('Simulation (SDK not loaded)...');
-      await sleep(3000);
-      success = Math.random() > 0.45;
-      txHash  = '0x' + Array.from({ length: 64 }, () =>
-        Math.floor(Math.random() * 16).toString(16)).join('');
-    }
 
     hideLoading();
 
