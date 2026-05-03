@@ -246,7 +246,7 @@ async function checkTreasure() {
     if (glClient) {
       hasTreasure = await glClient.readContract({
         address:      CONTRACT_ADDRESS,
-        functionName: 'controlla_tesoro',
+        functionName: 'check_treasure',
         args:         [],
       });
     } else {
@@ -299,7 +299,7 @@ async function challengeGuardian() {
 
       txHash = await glClient.writeContract({
         address:      CONTRACT_ADDRESS,
-        functionName: 'chiedi_tesoro',
+        functionName: 'ask_for_treasure',
         args:         [phrase],
         value:        BigInt(0),
       });
@@ -327,7 +327,7 @@ async function challengeGuardian() {
       // Read final state to determine outcome
       const hasTreasureNow = await glClient.readContract({
         address:      CONTRACT_ADDRESS,
-        functionName: 'controlla_tesoro',
+        functionName: 'check_treasure',
         args:         [],
       }).catch(() => null);
 
