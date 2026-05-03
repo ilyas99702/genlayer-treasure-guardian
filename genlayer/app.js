@@ -301,13 +301,6 @@ async function challengeGuardian() {
         'https://unpkg.com/genlayer-js@1.1.7/dist/types/index.js'
       ).catch(() => ({ TransactionStatus: { FINALIZED: 'FINALIZED', ACCEPTED: 'ACCEPTED' } }));
 
-      // Richiedi la firma su MetaMask prima di inviare la transazione vera e propria
-      updateLoadingStep('Waiting for wallet confirmation in MetaMask...');
-      await window.ethereum.request({
-        method: 'personal_sign',
-        params: [`I authenticate my challenge to the Guardian with this exact phrase:\n\n"${phrase}"`, connectedAddress]
-      });
-
       updateLoadingStep('Leader node is executing the contract with the AI...');
 
       txHash = await glClient.writeContract({
